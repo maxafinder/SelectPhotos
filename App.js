@@ -7,8 +7,12 @@ import { color } from 'react-native/Libraries/Components/View/ReactNativeStyleAt
 
 export default function App() {
 
-  let openImagePickerAsync = async () => {
+  // use React hook for setting the selected image
+  const [selectedImage, setSelectedImage] = React.useState(null);
 
+
+
+  let openImagePickerAsync = async () => {
     // get permission from user to access camera roll
     let libraryPermissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -19,20 +23,33 @@ export default function App() {
     }
 
     // let user select image from their camera roll
-    let selection =await ImagePicker.launchImageLibraryAsync();
+    let picked = await ImagePicker.launchImageLibraryAsync();
 
     // if they cancelled the selection
-    if (selection.cancelled == true) {
+    if (picked.cancelled == true) {
       return;
     }
 
-    console.log(selection);
-  
+    // set the selected image
+    setSelectedImage({ localUri: picked.uri });
+  }; // openImagePickerAsync()
+
+
+
+
+
+  // Show choosen image
+  if (selectedImage != null) {
+    return (
+      <View style={styles.container}>
+        <Image source={{ uri: selectedImage.localUri }} style={styles.image}/>
+      </View>
+    );
   }
 
 
 
-
+  // Instructions and choose button
   return (
     <View style={styles.container}>
       <Text style={styles.instructionText}>To share photo from your phone, press button</Text>
@@ -42,6 +59,7 @@ export default function App() {
       </TouchableOpacity>
     </View>
   );
+
 
 } // App()
 
@@ -55,6 +73,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  image: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain"
   },
 
   instructionText: {
